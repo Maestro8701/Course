@@ -1,91 +1,173 @@
-#include "calculator.h"
-
+#include <cassert>
+#include <cstdlib>
 #include <iostream>
-#include <string>
+#include <sstream>
 
-using namespace std::literals;
+#include "calculator_ui.h"
 
-bool ReadNumber(Number& result) {
-    if (!(std::cin >> result)) {
-        std::cerr << "Error: Numeric operand expected"s << std::endl;
-        return false;
+void Test() {
+    {
+        std::istringstream input{"15 q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        
+        assert(ui.Parse(input));
+        assert(output.str().empty());
+        assert(errors.str().empty());
     }
-    return true;
-}
+    {
+        std::istringstream input{"42 / 6 + 3 = q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
 
-bool RunCalculatorCycle() {
-    Number init_number;
-    if (!ReadNumber(init_number)) {
-        return false;
+        assert(calc.GetNumberRepr() == "10.000000");
+        assert(output.str() == "10.000000\n");
+        assert(errors.str().empty());
     }
+    {
+        std::istringstream input{"2 + 2 * 2 = q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
 
-    Calculator calc;
-    calc.Set(init_number);
-
-    std::string token;
-    while(std::cin >> token) {
-        Number right;
-        if (token == "+"s) {
-            if (!ReadNumber(right)) {
-                break;
-            }
-            calc.Add(right);
-        } else if (token == "-"s) {
-            if (!ReadNumber(right)) {
-                break;
-            }
-            calc.Sub(right);
-        } else if (token == "*"s) {
-            if (!ReadNumber(right)) {
-                break;
-            }
-            calc.Mul(right);
-        } else if (token == "/"s) {
-            if (!ReadNumber(right)) {
-                break;
-            }
-            calc.Div(right);
-        } else if (token == "**"s) {
-            if (!ReadNumber(right)) {
-                break;
-            }
-            calc.Pow(right);
-        } else if (token == "s"s) {
-            calc.Save();
-        } else if (token == "l"s) {
-            if (!calc.HasMem()) {
-                std::cerr << "Error: Memory is empty"s << std::endl;
-                break;
-            }
-            calc.Load();
-        } else if (token == "="s) {
-            std::cout << calc.GetNumberRepr() << std::endl;
-        } else if (token == "c"s) {
-            calc.Set(0);
-        } else if (token == "n"s) {
-            calc.Set(-calc.GetNumber());
-        } else if (token == ":"s) {
-            if (!ReadNumber(right)) {
-                break;
-            }
-            calc.Set(right);
-        } else if (token == "q"s) {
-            return true;
-        } else {
-            std::cerr << "Error: Unknown token "s << token << std::endl;
-            break;
-        }
+        assert(output.str() == "8.000000\n");
+        assert(errors.str().empty());
     }
-    return false;
+    {
+        std::istringstream input{"2 + 2 * 2 = q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str() == "8.000000\n");
+        assert(errors.str().empty());
+    }
+    {
+        std::istringstream input{"-1 * -1 * -1 - -1 * -1 * -1 = q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str() == "0.000000\n");
+        assert(errors.str().empty());
+    }
+    {
+        std::istringstream input{"10 / 0 + 15 = q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str() == "inf\n");
+        assert(errors.str().empty());
+    }
+    {
+        std::istringstream input{"10 / -0 + 15 = q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str() == "-inf\n");
+        assert(errors.str().empty());
+    }
+    {
+        std::istringstream input{"10 + 5 =\n"
+                                 ": 5 ** 5 =\n"
+                                 "s + 5 =\n"
+                                 "l =\n"
+                                 "+ 10 =\n"
+                                 "l =\n"
+                                 "q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str() == "15.000000\n3125.000000\n3130.000000\n"
+                               "3125.000000\n3135.000000\n3125.000000\n");
+        assert(errors.str().empty());
+    }
+    {
+        std::istringstream input{"15 n = q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str() == "-15.000000\n");
+        assert(errors.str().empty());
+    }
+    {
+        std::istringstream input{"10 + 5 =\nl q"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str() == "15.000000\n");
+        assert(errors.str() == "Error: Memory is empty\n");
+    }
+    {
+        std::istringstream input{"15 hello"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str().empty());
+        assert(errors.str() == "Error: Unknown token hello\n");
+    }
+    {
+        std::istringstream input{"hello"};
+        std::ostringstream output;
+        std::ostringstream errors;
+        
+        Calculator calc;
+        CalculatorUI ui{calc, output, errors};
+        ui.Parse(input);
+
+        assert(output.str().empty());
+        assert(errors.str() == "Error: Numeric operand expected\n");
+    }
 }
 
 constexpr int CALCULATION_ERROR = 1;
 
 int main() {
-    std::string type;
-    std::cin >> std::ws;
+    Test();
 
-    if (!RunCalculatorCycle()) {
+    Calculator calc;
+    CalculatorUI ui{calc, std::cout, std::cerr};
+    if (!ui.Parse(std::cin)) {
         std::cerr << "Program failed! Error code: " << CALCULATION_ERROR << std::endl;
     }
 }
