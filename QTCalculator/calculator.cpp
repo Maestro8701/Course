@@ -29,6 +29,7 @@ void Calculator::Pow(Number n) {
     current_value_ = std::pow(current_value_, n);
 }
 
+/*
 void Calculator::Save() {
     memory_state_ = true;
     memory_slot_ = current_value_;
@@ -41,6 +42,7 @@ void Calculator::Load() {
 bool Calculator::HasMem() const {
     return memory_state_;
 }
+*/
 
 std::string Calculator::GetNumberRepr() const {
     return std::to_string(current_value_);
