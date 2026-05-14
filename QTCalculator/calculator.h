@@ -21,19 +21,12 @@ public:
 
     void Pow(Number n);
 
-    void Save();
-
-    void Load();
-
-    bool HasMem() const;
-
     std::string GetNumberRepr() const;
 
 private:
     Number current_value_;
-    Number memory_slot_;
-    bool memory_state_ = false;
 
 };
 
 
+// Реализуйте здесь класс Calculator.
