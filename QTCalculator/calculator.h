@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <string>
@@ -52,18 +51,16 @@ std::optional<Error> Mul(Number n) {
 
     std::optional<Error> Pow(Number n) {
         if constexpr (std::is_same_v<Number, Rational>) {
-            // Для Rational использовать глобальную Pow
             if (n.GetDenominator() != 1) {
                 return std::string("Fractional power is not supported");
             }
             if (current_value_ == Rational{0} && n == Rational{0}) {
                 return std::string("Zero power to zero");
             }
-            current_value_ = ::Pow(current_value_, n);  // Вызов для Rational
+            current_value_ = ::Pow(current_value_, n);  
             return std::nullopt;
         }
         else if constexpr (std::is_integral_v<Number>) {
-            // Для целых чисел использовать IntegerPow
             if (n < 0) {
                 return std::string("Integer negative power");
             }
