@@ -26,7 +26,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0" columnstretch="0,1,1,1,1,1">
-    <!-- Исправленный блок: добавил закрывающий тег для l_formula и пустую ячейку -->
     <item row="0" column="0">
      <widget class="QComboBox" name="cmb_controller">
       <property name="font">
