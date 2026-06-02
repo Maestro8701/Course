@@ -1,4 +1,3 @@
-// Реализуйте класс главного окна.
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
