@@ -67,7 +67,7 @@ std::optional<Error> Mul(Number n) {
             if (current_value_ == Number{0} && n == Number{0}) {
                 return std::string("Zero power to zero");
             }
-            current_value_ = IntegerPow(current_value_, n);  // Используем IntegerPow
+            current_value_ = IntegerPow(current_value_, n);  
             return std::nullopt;
         }
         else {  // Для double, float и т.д.
